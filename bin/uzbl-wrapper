@@ -1,0 +1,17 @@
+#! /bin/sh
+
+if [ -f /etc/uzblpriv.conf ]; then
+	. /etc/uzblpriv.conf
+elif [ -f etc/uzblpriv.conf ]; then
+	. etc/uzblpriv.conf
+elif [ -f ../etc/uzblpriv.conf ]; then
+	. ../etc/uzblpriv.conf
+else
+	exit 1
+fi
+
+emit_uzbl_config "$1" > .temp.uzbl
+uzbl-browser -c .temp.uzbl $1
+
+#EMITTED_APP=<$(emit_uzbl_config "$1")
+#echo "$EMITTED_APP" | uzbl-browser -c -

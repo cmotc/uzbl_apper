@@ -1,0 +1,60 @@
+# === Core settings ==================================================
+# common directory locations
+set data_home   /home/dyngar/UzblApps/facebook.com/
+set data_dirs   /home/dyngar/UzblApps/facebook.com/data
+set cache_home  /home/dyngar/UzblApps/facebook.com/cache
+set config_home /home/dyngar/UzblApps/facebook.com/config
+set local_storage_path /home/dyngar/UzblApps/facebook.com/databases
+set comm_dir   /home/dyngar/UzblApps/facebook.com/pipes
+set fifo_dir   /home/dyngar/UzblApps/facebook.com/pipes
+set socket_dir /home/dyngar/UzblApps/facebook.com/pipes
+# === General config aliases ===========================================
+# Config related events (use the event function):
+# event MODE_CONFIG <mode> <key> = <value>
+set mode_config     event MODE_CONFIG
+# event ON_EVENT <EVENT_NAME> <command>
+set on_event        event ON_EVENT
+# event ON_SET   <key/glob> <command>
+set on_set          event ON_SET
+# event MODMAP <From> <To>
+set modmap          event MODMAP
+# event IGNORE_KEY <glob>
+set ignore_key      event IGNORE_KEY
+set set_mode        set mode
+set set_status      set status_message
+# === Dynamic event handlers ===========================================
+# What to do when a website wants to open a new window:
+# Open link in new window
+@on_event   NEW_WINDOW     spawn_sh 'uzbl-wrapper ${0:-"$0"}' %r
+# What to do when the user requests a new window:
+# If your the NEW_WINDOW handler opens the uri in the current window, you'll
+# probably want to change this handler to open a new window or tab.
+@on_event   REQ_NEW_WINDOW event @- if (@embedded) "NEW_TAB"; else "NEW_WINDOW" -@ %s
+@on_event   LOAD_START     @set_mode
+# add some javascript to the page for other 'js' commands to access later.
+# @on_event   LOAD_COMMIT    js page string 'uzbl = {}'
+# @on_event   LOAD_COMMIT    js page file @scripts_dir/formfiller.js
+# @on_event   LOAD_COMMIT    js page file @scripts_dir/follow.js
+# @on_event   LOAD_COMMIT    js page file @scripts_dir/go_input.js
+# @on_event   LOAD_COMMIT    js page file @scripts_dir/navigation.js
+# Userscripts/per-site-settings. See the script and the example configuration for details
+# @on_event   LOAD_COMMIT    spawn @scripts_dir/per-site-settings.py @data_home/per-site-settings
+# Switch to insert mode if a (editable) html form is clicked
+@on_event   FORM_ACTIVE    @set_mode insert
+# Switch to insert mode if a (editable) html form gains focus
+#@on_event   FOCUS_ELEMENT  spawn_sh 'if [ "$0" = INPUT -o "$0" = TEXTAREA -o "$0" = SELECT ]; then echo "@set_mode insert" > $UZBL_FIFO; fi' %s
+# Switch to command mode if anything else is clicked
+@on_event   ROOT_ACTIVE    @set_mode command
+# === Useragent setup ==================================================
+#Fix useragent to Mozilla on Windows.
+set useragent Mozilla/5.0 (Windows NT 6.1; rv:38.0) Gecko/20100101 Firefox/38.0
+# === Configure cookie blacklist =======================================
+set cookie_policy always
+# Accept 'session cookies' from uzbl.org (when you have a whitelist all other cookies are dropped)
+#event WHITELIST_COOKIE domain '(^|\.)uzbl\.org$' expires '^$'
+# Drop google analytics tracking cookies (applied after whitelists, if any)
+#event BLACKLIST_COOKIE name '^__utm.$'
+# === Javascript configuration  ========================================
+# set enable_scripts 0
+# === Proxy configuration  =============================================
+set proxy_url http://localhost:9050#tor
