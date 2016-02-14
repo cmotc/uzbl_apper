@@ -11,7 +11,9 @@ else
 fi
 
 emit_uzbl_config "$1" > .temp.uzbl
-uzbl-browser -c .temp.uzbl $1
+sleep 1
+uzbl-browser --config=.temp.uzbl $1 2> /dev/null
+#torsocks uzbl-browser -c .temp.uzbl $1 2> /dev/null
 
 #EMITTED_APP=<$(emit_uzbl_config "$1")
 #echo "$EMITTED_APP" | uzbl-browser -c -
